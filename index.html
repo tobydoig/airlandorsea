@@ -3,7 +3,14 @@
     <title>Air, Land or Sea?</title>
   </head>
   <body>
-    Choose an image for your mode of transportation: <input id="photo" type="file">
+    <h1>Is It By Air, Land or Sea?</h1>
+    <p>This is an image recognition model trained to recognise freight transportation methods, specifically <i>air</i>, <i>land</i> and <i>sea</i>.
+    You upload a picture (eg. trucks, ships, shipping containers, planes), and I'll tell you which transportation method I think it is.
+    Behind the scenes I'm calling a <a href="https://huggingface.co/spaces/tobyandzuzka/landseaair" target="_blank">HuggingFaces API</a> which
+    uses a ResNet model I trained up (well, fine-tuned really).</p>
+    <p>
+      Choose an image for your mode of transportation: <input id="photo" type="file">
+    </p>
     <div id="results"></div>
     <script>
       async function loaded(reader) {
@@ -12,8 +19,9 @@
           headers: { "Content-Type": "application/json" }
         });
         const json = await response.json();
-        const label = json['data'][0]['confidences'][0]['label'];
-        results.innerHTML = `<br/><img src="${reader.result}" width="300"> <p>${label}</p>`
+        console.log(JSON.stringify(json));
+        const confidence = json.data[0].confidences[0];
+        results.innerHTML = `<br/><img src="${reader.result}" width="300"> <p>I am ${(confidence.confidence * 100).toFixed(2)}% confident this is <i>by ${confidence.label}</i></p>`
       }
       function read() {
         const reader = new FileReader();
